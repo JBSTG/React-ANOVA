@@ -6,7 +6,7 @@ export class Home extends Component {
         this.state = {
             numDataSets: 2,
             data: [],
-            formattedData:[],
+            formattedData: [],
             testStatistic: 0,
             degreesOfFreedom: 0,
             k: null,
@@ -18,7 +18,7 @@ export class Home extends Component {
             fStatistic: null,
             dof1: null,
             dof2: null,
-            pValue:null
+            pValue: null
         }
         this.renderDataSets = this.renderDataSets.bind(this);
         this.returnAnovaResults = this.returnAnovaResults.bind(this);
@@ -38,14 +38,29 @@ export class Home extends Component {
     returnAnovaResults() {
 
         var fd = [...this.state.data];
+
+
+        //Each dataset's input
         for (var i = 0; i < fd.length; i++) {
+
+            //Remove consecutive commas
+            fd[i] = fd[i].replace(/,{2,}/gi, ',');
+            console.log(fd[i]);
+
+            //Check for trailing commas.
+            if (fd[i].slice(-1) === ',') {
+                fd[i] = fd[i].slice(0,-1);
+            }
+
+
             fd[i] = fd[i].split(",");
+            //Parse each set's input.
             for (var j = 0; j < fd[i].length; j++) {
                 fd[i][j] = parseFloat(fd[i][j]);
             }
         }
         this.setState({ formattedData: fd });
-        
+
         fetch("/Anova/Post",
             {
                 method: "POST",
@@ -95,19 +110,69 @@ export class Home extends Component {
             <div>
                 <Title />
                 {this.renderDataSets()}
-                <button onClick={this.removeDataSet}>-</button>
-                <button onClick={this.addDataSet}>+</button>
-                <button onClick={this.returnAnovaResults}>Analyze</button>
-                <p>Output</p>
-                <p>F-Statistic: {this.state.fStatistic}</p>
-                <p>K: {this.state.k}</p>
-                <p>N: {this.state.grandMean}</p>
-                <p>DOF1: {this.state.dof1}</p>
-                <p>DOF2: {this.state.dof2}</p>
-                <p>SSE: {this.state.sumSquareOfError}</p>
-                <p>SSTr: {this.state.sumSquareOfTreatments}</p>
-                <p>MSE: {this.state.meanSquareOfError}</p>
-                <p>MSTr: {this.state.meanSquareOfTreatments}</p>
+                <div className="offset-md-3 col-md-6 col-12 control-panel">
+                    <button className="quantity-change-button" onClick={this.removeDataSet}>-</button>
+                    <button className="quantity-change-button" onClick={this.addDataSet}>+</button>
+                    <button className="submit-button" onClick={this.returnAnovaResults}>Analyze</button>
+                </div>
+                <div className="output-area">
+                    <div className="output-header">
+                        <p>Output</p>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">DOF1: </p>
+                            <p className="answer-value">{this.state.dof1}</p>
+                        </div>
+
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">DOF2: </p>
+                            <p className="answer-value">{this.state.dof2}</p>
+                        </div>
+
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">F-Statistic: </p>
+                            <p className="answer-value">{this.state.fStatistic}</p>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">K: </p>
+                            <p className="answer-value">{this.state.k}</p>
+                        </div>
+
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">N: </p>
+                            <p className="answer-value">{this.state.grandMean}</p>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">SSTr: </p>
+                            <p className="answer-value">{this.state.sumSquareOfTreatments}</p>
+                        </div>
+
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">SSE: </p>
+                            <p className="answer-value">{this.state.sumSquareOfError}</p>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">MSE: </p>
+                            <p className="answer-value">{this.state.meanSquareOfError}</p>
+                        </div>
+
+                        <div className="col-md-4 col-12">
+                            <p className="answer-header">MSTr: </p>
+                            <p className="answer-value">{this.state.meanSquareOfTreatments}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -116,7 +181,14 @@ export class Home extends Component {
 class Title extends Component {
     render() {
         return (
-            <h1>React ANOVA</h1>
+            <div>
+                <h1 className="title-text-line-one col-md-6 offset-md-3 col-12">
+                    React
+            </h1>
+                <h1 className="title-text col-md-6 offset-md-3 col-12">
+                    A.N.O.V.A.
+            </h1>
+            </div>
         );
     }
 }
@@ -136,8 +208,8 @@ class DataSet extends Component {
 
     render() {
         return (
-            <div>
-                <input type="text" onChange={this.updateValue}></input>
+            <div className="col-md-6 offset-md-3 col-12">
+                <input className="dataset-input" placeholder="Enter data values here." type="text" onChange={this.updateValue}></input>
                 <br />
             </div>
         );

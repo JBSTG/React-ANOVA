@@ -1,14 +1,99 @@
 /* Provide sufficient contrast against white background */
-a {
-  color: #0366d6;
+
+
+@font-face {
+    font-family: Unbuttoned;
+    src: url("./unbutton.ttf");
 }
 
-code {
-  color: #E01A76;
+
+@font-face {
+    font-family: Roboto-Thin;
+    src: url("./Roboto-Thin.ttf");
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+@font-face {
+    font-family: Roboto-Condensed;
+    src: url("./Roboto-Condensed.ttf");
+}
+
+
+@font-face {
+    font-family: Roboto-Light;
+    src: url("./Roboto-Light.ttf");
+}
+
+
+.container{
+    background-color:white;
+}
+
+.title-text{
+    font-family:Unbuttoned;
+    color:dodgerblue;
+    text-align:center;
+}
+
+.title-text-line-one {
+    font-family: Roboto-Thin;
+    color: dodgerblue;
+    text-align: center;
+}
+
+
+.quantity-change-button {
+    color: gray;
+    background-color: white;
+    border: 0px;
+    padding: 0px;
+    height: 5vh;
+    width: 5vh;
+    margin: 1vh;
+    border: 1px darkslategray solid;
+    border-radius:100%;
+    line-height:100%;
+}   
+
+.output-area{
+    background-color:white;
+    color:black;
+    font-family:Roboto-Light;
+}
+
+.submit-button {
+    color: gray;
+    background-color: white;
+    border: 0px;
+    padding: 0px;
+    height: 5vh;
+    margin: 1vh;
+    border: 1px darkslategray solid;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    font-size:100%;
+    overflow:hidden;
+}
+
+.dataset-input{
+    font-size:5vh;
+    width:100%;
+    margin:10px;
+    font-family:'Times New Roman', Times, serif;
+    color:dimgray;
+}
+.control-panel{
+    text-align:center;
+}
+
+.output-header p{
+    border-bottom:0.5px gray solid;
+    padding:0px;
+}
+
+.answer-header {
+    display: inline;
+}
+.answer-value{
+    display:inline;
+    color:dodgerblue;
 }
