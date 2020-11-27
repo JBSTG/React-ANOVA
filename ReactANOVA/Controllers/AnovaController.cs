@@ -27,9 +27,11 @@ namespace ReactANOVA.Controllers
             for (int i = 0;i<body.Count;i++)
             {
                 samples.Add(Anova.CreateSampleFromData(body[i]));
+                Debug.WriteLine(samples[i].sd);
             }
+
+
             double grandMean = Anova.GetGrandMean(samples);
-            Console.WriteLine("Grand Mean " + grandMean);
             double SSTr = Anova.GetSSTr(samples, grandMean);
             double SSE = Anova.GetSSE(samples);
             int N = Anova.GetTotalObservations(samples);
@@ -37,10 +39,19 @@ namespace ReactANOVA.Controllers
             double MSTr = Anova.GetMSTr(SSTr, k);
             double MSE = Anova.GetMSE(SSE, N, k);
 
-            Anova.TukeyKramerComparison(samples, MSE, 3.74);
 
             int df1 = k - 1;
             int df2 = N - k;
+
+            Debug.WriteLine("N: "+N);
+            Debug.WriteLine("k: "+k);
+            Debug.WriteLine("SSTr: "+SSTr);
+            Debug.WriteLine("SSE: "+SSE);
+            Debug.WriteLine("MSTr: "+MSTr);
+            Debug.WriteLine("MSE: "+MSE);
+            Debug.WriteLine("df1: "+df1);
+            Debug.WriteLine("df2: "+df2);
+            Debug.WriteLine("F: "+MSTr/MSE);
 
             return Json(new {
                 grandMean=N,
@@ -52,13 +63,9 @@ namespace ReactANOVA.Controllers
                 degreesOfFreedomOne=df1,
                 degreesOfFreedomTwo=df2,
                 fStatistic=MSTr/MSE,
-                pValue=-1
+                pValue=-1,
+                tkIntervals=Anova.TukeyKramerComparison(samples, MSE)
             });
         }
-
-
-
-
-
     }
 }
