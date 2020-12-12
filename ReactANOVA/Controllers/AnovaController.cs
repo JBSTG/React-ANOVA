@@ -43,6 +43,7 @@ namespace ReactANOVA.Controllers
             int df1 = k - 1;
             int df2 = N - k;
 
+            /*
             Debug.WriteLine("N: "+N);
             Debug.WriteLine("k: "+k);
             Debug.WriteLine("SSTr: "+SSTr);
@@ -52,7 +53,7 @@ namespace ReactANOVA.Controllers
             Debug.WriteLine("df1: "+df1);
             Debug.WriteLine("df2: "+df2);
             Debug.WriteLine("F: "+MSTr/MSE);
-
+            */
             return Json(new {
                 grandMean=N,
                 numDataSets=k,
@@ -64,6 +65,7 @@ namespace ReactANOVA.Controllers
                 degreesOfFreedomTwo=df2,
                 fStatistic=MSTr/MSE,
                 pValue=-1,
+                labels=Anova.TukeyKramerLabels(samples.Count),
                 tkIntervals=Anova.TukeyKramerComparison(samples, MSE)
             });
         }

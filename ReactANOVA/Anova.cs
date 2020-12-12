@@ -186,6 +186,20 @@ namespace ReactANOVA
             return FivePercentAlphaSRT[26,kIndex];
         }
 
+        public static List<int[]> TukeyKramerLabels(int samples)
+        {
+            List<int[]> labels = new List<int[]>();
+            for (int i = 0;i<samples-1;i++)
+            {
+                for (int j = i + 1; j < samples; j++)
+                {
+                    //labels.Add("μ_" + (i+1)+" - "+ "μ_" + (j+1));
+                    labels.Add(new int[] { (i + 1), (j + 1) });
+                }
+            }
+            return labels;
+        }
+
         public static List<double[]> TukeyKramerComparison(List<Sample> samples, double MSE)
         {
             int total = 0;

@@ -69,7 +69,7 @@ export class Home extends Component {
             //Parse each set's input.
             for (var j = 0; j < fd[i].length; j++) {
                 fd[i][j] = parseFloat(fd[i][j]);
-                console.log(fd[i]);
+                //console.log(fd[i]);
                 if (Number.isNaN(fd[i][j])) {
                     currentErrors[i] = 1;
                 }
@@ -106,6 +106,7 @@ export class Home extends Component {
                     dof2: res.degreesOfFreedomTwo,
                     fStatistic: res.fStatistic,
                     pValue: res.pValue,
+                    labels: res.labels,
                     intervals: res.tkIntervals
                 });
             }));
@@ -156,7 +157,7 @@ export class Home extends Component {
                             <button className="submit-button" onClick={this.returnAnovaResults}>Analyze</button>
                         </div>
                     </div>
-                    <TukeyKramerVisualization dataSets={this.state.numDataSets} intervals={this.state.intervals} />
+                    <TukeyKramerVisualization dataSets={this.state.numDataSets} intervals={this.state.intervals} labels={this.state.labels}/>
                 </div>
 
                 <div className="output-area">
@@ -242,33 +243,92 @@ class TukeyKramerVisualization extends Component {
         super(props);
         this.graph = React.createRef();
         this.drawTkIntervals = this.drawTkIntervals.bind(this);
+        this.calculateLeftPosition = this.calculateLeftPosition.bind(this);
     }
 
 
     drawTkIntervals() {
 
         if (this.props.intervals == null || this.graph.current == null) {
-            return <text key={-3} x="50%" y="50%" textAnchor="middle" fill="black">Tukey Kramer diagram coming soon!</text>;
+            return <text key={-3} x="50%" y="50%" textAnchor="middle" fill="black">Click 'Analyze' to generate a Tukey-Kramer Diagram</text>;
         }
 
+        var maxAndMin = this.calculateIntervalMaxAndMin(this.props.intervals);
+        var max = maxAndMin.max;
+        var min = maxAndMin.min;
+
+        var normalizedIntervals = JSON.parse(JSON.stringify(this.props.intervals));
+        var legend = [-3,-2,-1, 0, 1, 2, 3];
+        var normalizedLegend = this.calculateNormalizedLegend(legend,min,max);
+        for (var i = 0; i < normalizedIntervals.length; i++) {
+            normalizedIntervals[i][0] = (normalizedIntervals[i][0] - min) / (max - min);
+            normalizedIntervals[i][1] = (normalizedIntervals[i][1] - min) / (max - min);
+        }
+
+        console.log(normalizedIntervals);
+
+        min = min.toPrecision(2);
+        max = max.toPrecision(2);
+
         var content = [];
-
-
         var width = this.graph.current.width.baseVal.value;
         var height = this.graph.current.height.baseVal.value;
 
-        console.log(height);
-        content.push(<text key={-3} x="50%" y="50%" textAnchor="middle" fill="black">Tukey Kramer diagram coming soon!</text>);
-        /*
-        content.push(<text key={-3} x={width/2} y="15" fill="black">0</text>);
-        content.push(<text key={-2} x={width/4} y="15" fill="black">0</text>);
-        content.push(<text key={-1} x={3*width/4} y="15" fill="black">0</text>);
+        var offset = 0;
+        var scale = 1;
+
+        for (var i = 0; i < normalizedLegend.length; i++) {
+            content.push(<text key={-(i+1)} x={this.calculateLeftPosition(normalizedLegend[i],width,offset)} y={15}>{legend[i]}</text>);
+        }
+
         for (var i = 0; i < this.props.intervals.length; i++) {
-            content.push(<rect key={i} x="0" y={i * 10} width="10" height="10" />);
-        }*/
-
-
+            var left = this.calculateLeftPosition(normalizedIntervals[i][0],width,offset);
+            var top = 30 + i * 20;
+            var intervalWidth = ((normalizedIntervals[i][1] - normalizedIntervals[i][0]) * width)*scale;
+            var fill = (0 > this.props.intervals[i][0]) && (0 < this.props.intervals[i][1]) ? "dodgerblue" : "lightgray";
+            content.push(<rect fill={fill} key={i} x={left} y={top} width={intervalWidth} height="15" />);
+            content.push(
+                <text textAnchor="middle" key={(i + 1) * 100} x={left + intervalWidth / 2} y={top + 13} fontSize={13} fill="white">
+                    &nbsp;
+                MU<tspan fontSize="9" fill="white">{this.props.labels[i][0]}</tspan>
+                &nbsp;-&nbsp;
+                MU<tspan fontSize="9" fill="white">{this.props.labels[i][1]}</tspan>
+                </text>
+            );
+        }
         return content;
+    }
+    calculateIntervalMaxAndMin(intervals) {
+
+        var min = 999999999;
+        var max = -999999999;
+
+
+        for (var i = 0; i < intervals.length; i++) {
+            if (this.props.intervals[i][0] < min) {
+                min = intervals[i][0];
+            }
+            if (intervals[i][1] < min) {
+                min = intervals[i][1];
+            }
+            if (intervals[i][0] > max) {
+                max = intervals[i][0];
+            }
+            if (intervals[i][1] > max) {
+                max = intervals[i][1];
+            }
+        }
+        return {max:max,min:min}
+    }
+    calculateLeftPosition(value,width,offset) {
+        return value * width + offset * width;
+    }
+    calculateNormalizedLegend(values, min, max) {
+        var normalizedValues = Array(values.length).fill();
+        for (var i = 0; i < values.length; i++) {
+            normalizedValues[i] = (values[i] - min) / (max - min);
+        }
+        return normalizedValues;
     }
 
     render() {
