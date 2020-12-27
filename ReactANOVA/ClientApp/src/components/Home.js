@@ -166,55 +166,87 @@ export class Home extends Component {
                     </div>
 
                     <div className="row">
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">DOF1: </p>
                             <p className="answer-value">{this.state.dof1}</p>
+                            <span className="tool-tip-text">
+                                Degrees of Freedom 1, also known as the treatment degrees of freedom,
+                                used as to find P in the F test, as well as the MSTr. 
+                            </span>
                         </div>
 
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">DOF2: </p>
                             <p className="answer-value">{this.state.dof2}</p>
+                            <span className="tool-tip-text">
+                                Degrees of Freedom 2, also known as the error degrees of freedom,
+                                used as to find P in the F test, as well as the MSE.
+                            </span>
                         </div>
 
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">F-Statistic: </p>
                             <p className="answer-value">{this.state.fStatistic}</p>
+                            <span className="tool-tip-text">
+                                Used to find P for a given significance level, Alpha. 
+                            </span>
                         </div>
                     </div>
 
                     <div className="row">
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">K: </p>
                             <p className="answer-value">{this.state.k}</p>
+                            <span className="tool-tip-text">
+                                The number of populations or treatments being compared.
+                            </span>
                         </div>
 
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">N: </p>
                             <p className="answer-value">{this.state.grandMean}</p>
+                            <span className="tool-tip-text">
+                                The grand mean, represents the total number of observations in the data set. 
+                            </span>
                         </div>
                     </div>
 
                     <div className="row">
-                        <div className="col-md-4 col-12">
-                            <p className="answer-header">SSTr: </p>
+                        <div className="col-md-4 col-12 tool-tip">
+                            <p className="answer-header ">SSTr:
+                                <span className="tool-tip-text">
+                                    Treatment sum of squares, a measure of differences among the sample means.
+                                </span>
+                            </p>
                             <p className="answer-value">{this.state.sumSquareOfTreatments}</p>
+        
+
                         </div>
 
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">SSE: </p>
                             <p className="answer-value">{this.state.sumSquareOfError}</p>
+                            <span className="tool-tip-text">
+                                A measure of variation within the K samples.
+                            </span>
                         </div>
                     </div>
 
                     <div className="row">
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">MSE: </p>
                             <p className="answer-value">{this.state.meanSquareOfError}</p>
+                            <span className="tool-tip-text">
+                                Mean square for error, found by dividing SSE and df2.
+                            </span>
                         </div>
 
-                        <div className="col-md-4 col-12">
+                        <div className="col-md-4 col-12 tool-tip">
                             <p className="answer-header">MSTr: </p>
                             <p className="answer-value">{this.state.meanSquareOfTreatments}</p>
+                            <span className="tool-tip-text">
+                                Mean square for treatment, found by dividing SSTr and df1.
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -241,9 +273,46 @@ class TukeyKramerVisualization extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            intervalLow: "1",
+            intervalHigh: "1",
+            intervalDecision: "1"
+        }
+
         this.graph = React.createRef();
+        this.details = React.createRef();
         this.drawTkIntervals = this.drawTkIntervals.bind(this);
         this.calculateLeftPosition = this.calculateLeftPosition.bind(this);
+        this.displayDetailedInformation = this.displayDetailedInformation.bind(this);
+        this.hideDetailedInformation = this.hideDetailedInformation.bind(this);
+    }
+
+    displayDetailedInformation(e,interval) {
+        e.target.style.fill = "rgba(255,255,255,0.5)";
+        this.details.current.className = "detailed-information";
+
+        
+        this.details.current.style.top = (e.clientY+10) + "px";
+        this.details.current.style.left = (e.clientX - this.details.current.clientWidth / 2) + "px";
+
+        var decision = "is";
+        if (interval[0] <= 0 && 0 <= interval[1] ) {
+            decision = "is not";
+        }
+
+
+        this.setState({
+            intervalLow: interval[0].toPrecision(3),
+            intervalHigh: interval[1].toPrecision(3),
+            intervalDecision:decision
+        });
+
+        console.log(this.state);
+        
+    }
+    hideDetailedInformation(e) {
+        e.target.style.fill = "rgba(0,0,0,0)";
+        this.details.current.className = "detailed-information hidden-box";
     }
 
 
@@ -281,11 +350,11 @@ class TukeyKramerVisualization extends Component {
             content.push(<text key={-(i+1)} x={this.calculateLeftPosition(normalizedLegend[i],width,offset)} y={15}>{legend[i]}</text>);
         }
 
-        for (var i = 0; i < this.props.intervals.length; i++) {
+        for (let i = 0; i < this.props.intervals.length; i++) {
             var left = this.calculateLeftPosition(normalizedIntervals[i][0],width,offset);
             var top = 30 + i * 20;
             var intervalWidth = ((normalizedIntervals[i][1] - normalizedIntervals[i][0]) * width)*scale;
-            var fill = (0 > this.props.intervals[i][0]) && (0 < this.props.intervals[i][1]) ? "dodgerblue" : "lightgray";
+            var fill = (0 > this.props.intervals[i][0]) && (0 < this.props.intervals[i][1]) ? "lightgray" : "dodgerblue";
             content.push(<rect fill={fill} key={i} x={left} y={top} width={intervalWidth} height="15" />);
             content.push(
                 <text textAnchor="middle" key={(i + 1) * 100} x={left + intervalWidth / 2} y={top + 13} fontSize={13} fill="white">
@@ -295,6 +364,8 @@ class TukeyKramerVisualization extends Component {
                 MU<tspan fontSize="9" fill="white">{this.props.labels[i][1]}</tspan>
                 </text>
             );
+            content.push(<rect fill="rgba(255,255,255,0)" onMouseOver={(e) => { this.displayDetailedInformation(e, this.props.intervals[i])}} onMouseOut={(e) => { this.hideDetailedInformation(e) }} key={"c" + i} x={left} y={top} width={intervalWidth} height="15" />);
+
         }
         return content;
     }
@@ -334,15 +405,26 @@ class TukeyKramerVisualization extends Component {
     render() {
         return (
             <div className="col-md-6 col-12">
+                <div ref={this.details} className="detailed-information  hidden-box">
+                    <p>Range:&nbsp;
+                        <p className="answer-value">{this.state.intervalLow} - {this.state.intervalHigh}
+                        </p>
+                    </p>
+                    <p>
+                        There&nbsp;
+                        <p className="answer-value">{this.state.intervalDecision}</p>
+                        &nbsp;a significant difference between the two samples.
+                    </p>
+                </div>
                 <svg
                     ref={this.graph}
-                    onClick={this.drawTkIntervals}
                 >
                     {this.drawTkIntervals()}
                 </svg>
             </div>
         )
     }
+
 }
 
 class DataSet extends Component {

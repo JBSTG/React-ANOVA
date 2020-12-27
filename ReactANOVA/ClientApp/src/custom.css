@@ -108,3 +108,42 @@ svg{
     height:300px;
     border:1px black solid;
 }
+
+.svg-container {
+    display:inline;
+    float:left;
+}
+
+.detailed-information{
+    position:fixed;
+    left:0;
+    top:0;
+    display:inline;
+    background-color:white;
+    padding: 4px;
+    border: 1.5px gray solid;
+}
+
+.detailed-information p{
+    font-family:Roboto-Light;
+}
+
+.hidden-box{
+    display:none;
+}
+
+.tool-tip-text {
+    visibility: hidden;
+    background-color: rgba(0,0,0,0.8);
+    font-family: Roboto-Light;
+    color: white;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    font-size:1rem;
+    bottom:100%;
+}
+.tool-tip:hover .tool-tip-text{
+    visibility: visible;
+}
+
